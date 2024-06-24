@@ -1,23 +1,11 @@
 # Table of contents
-1. [GIT](#GIT)
-2. [Docker](#Docker)
+1. [GIT](#git-section)
+2. [Docker](#docker-section)
 
-## GIT Section <a name="GIT"></a>
-ddddddddddddd
+## GIT Section
+> This is used to allow GITHUB transactions. Need to be used in the terminal prior to committing:
 
+```git config user.name "github_user"```\
+```git config user.email "github_email"```
 
-ds
-ds
-ds
-ds
-ds
-ds
-ds
-dsd
-<br>
-<br><br><br><br><br><br><br><br><br><br><br>
-sd
-s
-ds
-ds
-## Docker Section <a name = "Docker"></a>
+## Docker Section
