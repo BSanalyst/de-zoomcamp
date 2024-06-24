@@ -26,5 +26,5 @@ If we have many containers using ```-d``` mode, we can simply use ```docker exec
 #### Examples
 1. docker run -it ubuntu bash
     > This will create an ubuntu image in a container with the parameter passed as bash which is executed in the terminal.
-    > The container will not be persistent. For instance, if we use docker run -it ubuntu bash again, another container will be created. <ins>To access the same container again</ins> we'll need to use ```docker start {container#}``` and if we want to get back into the ```docker exec -it {container#} bash```
+    > The container will not be persistent, in that, all changes to the container from creation can be lost. Whilst in the stopped state, we can restart them. However, once they've been deleted, we can't return to the last known cache. For instance, if we use docker run -it ubuntu bash again, another container will be created. <ins>To access the same container again</ins> we'll need to use ```docker start {container#}``` and if we want to get back into the ```docker exec -it {container#} bash```
 2. docker run -it
