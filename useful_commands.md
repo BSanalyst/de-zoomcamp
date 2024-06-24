@@ -7,11 +7,4 @@
 
 ```git config user.name "github_user"```\
 ```git config user.email "github_email"```
-
-<br><br><br><br><br><br><br><br><br>
-<br><br><br><br><br><br><br><br><br>
 ## Docker Section
-<br><br><br><br><br><br><br><br><br>
-<br><br><br><br><br><br><br><br><br>
-<br><br><br><br><br><br><br><br><br>
-<br><br><br><br><br><br><br><br><br>
