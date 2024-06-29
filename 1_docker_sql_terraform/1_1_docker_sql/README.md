@@ -80,6 +80,13 @@ We can leverage this:
     sys.argv[0]: This is the script name itself.\
     sys.argv[1] to sys.argv[n]: These are the command-line arguments passed to the script.
 
+**Example**
+```ENTRYPOINT ["python"]
+
+CMD ["pipeline.py","argument here", "another here"]
+```
+We could put pipeline.py into the entrypoint aswell. Tomato/Tomatoe type situation. This then passes these two arguments into it so we can leverage them in the python file.
+
 
 
 

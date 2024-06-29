@@ -6,6 +6,6 @@ WORKDIR /app
 
 COPY pipeline.py pipeline.py
 
-ENTRYPOINT [ "python"]
+ENTRYPOINT ["python"]
 
-CMD ["-c","print('hello world')"]
+CMD ["pipeline.py","argument here", "another here"]
