@@ -1,7 +1,17 @@
-# Table of contents
-1. [Installation](#install-section)
-2. [Docker](#docker-section) \
-    2.1. [Docker Run](#docker-run)
+- [Install Section](#install-section)
+  - [Apt Store](#apt-store)
+- [Docker Section](#docker-section)
+  - [Commands](#commands)
+  - [Docker Run](#docker-run)
+    - [Examples](#examples)
+  - [Docker build](#docker-build)
+    - [command examples](#command-examples)
+      - [Breakdown](#breakdown)
+    - [docker file examples](#docker-file-examples)
+      - [Breakdown](#breakdown-1)
+    - [passing arguments from CMD to the python file.](#passing-arguments-from-cmd-to-the-python-file)
+  - [Docker assets interacting](#docker-assets-interacting)
+    - [Interaction between elements](#interaction-between-elements)
 
 ## Install Section
 ### Apt Store
@@ -87,8 +97,9 @@ CMD ["pipeline.py","argument here", "another here"]
 ```
 We could put pipeline.py into the entrypoint aswell. Tomato/Tomatoe type situation. This then passes these two arguments into it so we can leverage them in the python file.
 
-
-
-
-
+### Docker assets interacting
+#### Interaction between elements
+When we want docker containers to interact, we have a couple of options.
+1. Create a docker network and associate this network to each docker container upon container creation.
+2. Create a docker.yml file which uses the command docker-compose. It will build the network automatically and it will also build all the resources we need automatically. 
 
