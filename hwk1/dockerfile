@@ -1,0 +1,12 @@
+# pandas, psycopg2, sqlalchemy
+#jupyter notebook ip==0.0.0.0 #this allows main comp ssh'd to root to connect
+
+url = "https://github.com/DataTalksClub/nyc-tlc-data/releases/download/green/green_tripdata_2019-09.csv.gz"
+resp = requests.get(url)
+
+if resp.status_code == 200:
+    with open(os.path.basename(url), "wb") as fhand:
+        fhand.write(resp.content)
+    print("file downloaded")
+else:
+    print("unsuccessful get request ... status code =",resp.status_code)
