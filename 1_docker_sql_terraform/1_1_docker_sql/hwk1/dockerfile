@@ -1,0 +1,10 @@
+FROM python
+
+RUN apt-get install wget
+RUN pip install pandas sqlalchemy psycopg2 requests argparse 
+
+WORKDIR /app
+
+COPY pipeline.py pipeline.py
+
+ENTRYPOINT ["python", "pipeline.py"]

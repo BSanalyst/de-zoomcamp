@@ -1,0 +1,157 @@
+
+Docker Commands:
+
+Running python on local machine; writing to container with postgres running. 
+python pipeline.py \
+  --username=hwk1_user \
+  --password=hwk1_password \
+  --container_ip=172.18.0.2 \
+  --port=5432 \
+  --database=hwk1_db \
+  --url_to_download=https://github.com/DataTalksClub/nyc-tlc-data/releases/download/green/green_tripdata_2019-09.csv.gz
+        
+
+Running a container in detached mode (note we're mapping a drive; ensure this drive is created)
+Note: --name is the name of the container. 
+docker run -d \
+--name postgres_hwk1 \ 
+-e POSTGRES_USER=hwk1_user \
+-e POSTGRES_PASSWORD=hwk1_password \
+-e POSTGRES_DB=hwk1_db \
+--network=hwk1_network \
+-p 5432:5432 \
+-v /home/bstring/hwk1/pg_data_mounting:/var/lib/postgresql/data \
+postgres
+
+
+Separate container with python in, lightweight. 
+docker run -it \
+	--name python_hwk1 \
+	--network=hwk1_network \
+	-p 8888:8888 \
+	python
+
+
+Creating a dockerfile; custom image:
+1) using docker build -t pypull:01 .
+2) running docker container using the newly created image. 
+2.1) notes: we define the netwrok it'll be part of before pulling the image. (recall parameters after image are passed as commands)
+docker run -it --network hwk1_network pypull:01 \
+	--username=hwk1_user \
+	--password=hwk1_password \
+	--container_ip=172.18.0.2 \
+	--port=5432 \
+	--database=hwk1_db \
+	--url_to_download=https://github.com/DataTalksClub/nyc-tlc-data/releases/download/green/green_tripdata_2019-09.csv.gz
+
+
+
+hwk 2: we needed two urls to download.
+docker run -it --network hwk1_network pypull:01 \
+	--username=hwk1_user \
+	--password=hwk1_password \
+	--container_ip=172.18.0.2 \
+	--port=5432 \
+	--database=hwk1_db \
+	--url_to_download=https://github.com/DataTalksClub/nyc-tlc-data/releases/download/green/green_tripdata_2019-09.csv.gz \
+    --url_to_download_lookup=https://github.com/DataTalksClub/nyc-tlc-data/releases/download/misc/taxi_zone_lookup.csv
+
+Pgadmin:
+docker run --network hwk1_network \
+    --name pgadminnamehere \
+    -p 80:80 \
+    -e 'PGADMIN_DEFAULT_EMAIL=admin@addy.com' \
+    -e 'PGADMIN_DEFAULT_PASSWORD=addy' \
+    -d dpage/pgadmin4
+
+
+SQL commands to answer homework:
+Q3:How many taxi trips were totally made on September 18th 2019? Tip: started and finished on 2019-09-18.
+> in PSQL
+hwk1_db=# SELECT count(*) from "green_tripdata_2019-09" WHERE CAST(lpep_pickup_datetime as date) = '2019-09-18' and CAST(lpep_dropoff_datetime as DATE) = '2019-09-18';
+ count 
+-------
+ 15612
+
+Q4: Which was the pick up day with the longest trip distance? Use the pick up time for your calculations.
+> in PSQL
+hwk1_db=# SELECT cast(lpep_pickup_datetime as date) FROM "green_tripdata_2019-09" WHERE trip_distance=(SELECT max(trip_distance) FROM "green_trip
+data_2019-09");
+ lpep_pickup_datetime 
+----------------------
+ 2019-09-26
+(1 row)
+
+Question 5. Three biggest pick up Boroughs
+Consider lpep_pickup_datetime in '2019-09-18' and ignoring Borough has Unknown
+Which were the 3 pick up Boroughs that had a sum of total_amount superior to 50000?
+> in PGadmin
+SELECT 
+	lu."Borough", SUM(tx.total_amount)
+FROM 
+	public."green_tripdata_2019-09" as tx 
+JOIN 
+	taxi_zone_lookup as lu
+ON
+	tx."DOLocationID" = lu."LocationID"
+WHERE 
+	lu."Borough" <> 'Unknown' and CAST(tx.lpep_pickup_datetime as date) = '2019-09-18'
+GROUP BY 
+	lu."Borough" 
+HAVING
+	SUM(tx.total_amount)>50000
+;
+
+  Borough  |        sum         
+-----------+--------------------
+ Brooklyn  |  77096.29999999968
+ Manhattan | 110317.90000000017
+ Queens    |  76881.24999999894
+
+
+Question 6:For the passengers picked up in September 2019 in the zone name Astoria
+which was the drop off zone that had the largest tip? We want the name of the zone, not the id.
+> in PGadmin
+WITH astoriaPUs as (
+SELECT 
+	tzl."Zone" as pickup_zone,
+	gt2019.*
+FROM 
+	taxi_zone_lookup as tzl
+JOIN
+	"green_tripdata_2019-09" as gt2019
+ON
+	tzl."LocationID" = gt2019."PULocationID"
+WHERE 
+	tzl."Zone" = 'Astoria' AND
+	EXTRACT('Year' from lpep_pickup_datetime) = '2019' AND
+	EXTRACT('Month' from lpep_pickup_datetime) = '9' 
+),
+dropOffs as (
+SELECT 
+	tzl."Zone" as dropoff_zone,
+	apus.* 
+FROM 
+	astoriaPUs as apus
+JOIN
+	taxi_zone_lookup as tzl
+ON 
+	apus."DOLocationID" = tzl."LocationID"
+),
+ranks as (
+SELECT 
+	RANK() OVER (ORDER BY tip_amount DESC),
+	*
+FROM 
+	dropOffs
+LIMIT 1
+) 
+SELECT 
+	*
+FROM 
+	ranks
+WHERE rank=1
+;
+ rank | dropoff_zone | pickup_zone | VendorID | lpep_pickup_datetime | lpep_dropoff_datetime | passenger_count | trip_distance | fare_amount | extra | mta_tax | tip_amount | total_amount | 
+    1 | JFK Airport  | Astoria     |        2 | 2019-09-08 18:10:40  | 2019-09-08 18:44:42   |               1 |         14.05 |          40 |     0 |     0.5 |      62.31 |       103.11 |            
+(1 row)
